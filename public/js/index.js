@@ -9,9 +9,12 @@ app.controller('UrlCtrl', ['$scope', '$http', function ($scope, $http) {
                 url: post.url
             }
             post.url = '';
-            $http.post('/', data)
+
+            $http.post('/api/longUrl', data)
+            // posts data to app.js
                 .success(function (data) {
                     $scope.short = data.shortUrl;
+                    // gets shortened URL from the object passed in by app.js
                 });
         }
         else {

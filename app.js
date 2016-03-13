@@ -18,29 +18,6 @@ app.use(function (req, res, next) {
     next();
 })
 
-mongoose.connect('mongodb://localhost/urls');
-
-mongoose.connection.on('open', function() {
-  console.log("Mongoose connected.");
-})
-
-var UrlSchema = mongoose.Schema({
-  orgUrl: String,
-  shortUrl: String,
-})
-
-var Url = mongoose.model('Url', UrlSchema);
-
-function makeShort(url) {
-  // from Henry Kaufman's URL shortener, https://github.com/hcjk/ShortURL
-  var str = "";
-  var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i = 0; i < 6; i++) {
-    str += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return str;
-}
-
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -50,49 +27,75 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+var connection = mongoose.createConnection('mongodb://localhost/urls');
+
+connection.on('open', function() {
+  console.log("Mongoose connected.");
+})
+
+var UrlSchema = mongoose.Schema({
+  orgUrl: String,
+  shortUrl: String,
+})
+
+var Url = connection.model('Url', UrlSchema);
+
 app.get('/', function (req, res) {
     res.render('index', {
-        title: 'URL Shortener'
+        title: 'Simple URLs'
     });
 });
 
-app.post('/', function(req, res) {
+app.post('/api/longUrl', function(req, res) {
   var longUrl = req.body.url;
-  var short = makeShort(longUrl);
-  console.log(longUrl);
-
-  function isAlreadyShort() {
-    Url.findOne({shortUrl: short}, function(err, url) {
-      if(url) {
-        short = makeShort(longUrl);
-        isAlreadyShort();
-      }
-    })
+  function makeShort() {
+    // from Henry Kaufman's URL shortener, https://github.com/hcjk/ShortURL
+    var str = "";
+    var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 6; i++) {
+      str += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return str;
   }
-  isAlreadyShort();
+  var short = makeShort();
+
+  // function isAlreadyShort() {
+  //   Url.findOne({shortUrl: short}, function(err, url) {
+  //     if(url) {
+  //       short = makeShort();
+  //       isAlreadyShort();
+  //     }
+  //   })
+  // }
+  // isAlreadyShort();
+  // Makes sure shortened URL isn't already in the database
 
   var curUrl = Url({
     orgUrl: longUrl,
     shortUrl: short
   });
 
-  Url.findOne({orgUrl: longUrl}, function(err, url) {
-    if(url) {
-      curUrl = url;
-    }
-  })
+  // Url.findOne({orgUrl: longUrl}, function(err, url) {
+  //   if(url) {
+  //     curUrl = url;
+  //   }
+  // })
+  // If URL already has a shortened link, will set shortened URL to the one already associated with it
 
   curUrl.save(function(err, obj) {
-    console.log(obj);
+    if(err) return console.log(err);
+    console.log("Saved object: " + obj);
+    res.send(obj);
+    // passes data to index.js to be processed by Angular
   })
 });
 
 app.get('/:url', function (req, res) {
   // from Henry Kaufman's URL shortener, https://github.com/hcjk/ShortURL
     var url = req.params.url;
-    Url.findOne({shortUrl: url}, function(err, link) {
-        if(link) {
-            res.redirect(link.orgUrl);
+    Url.findOne({shortUrl: url}, function(err, url) {
+        if(url) {
+            res.redirect(url.orgUrl);
         }
         else {
             res.render('error', {
@@ -111,6 +114,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
+    console.log(err.message);
     res.render('error', {
       message: err.message,
       error: err
