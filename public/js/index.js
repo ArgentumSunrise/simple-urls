@@ -4,7 +4,7 @@ var app = angular.module('app', []);
 app.controller('UrlCtrl', ['$scope', '$http', function ($scope, $http) {
     $scope.newURL = function (post) {
         if ((post.url.substring(0, 7).toLowerCase() === 'http://') || (post.url.substring(0, 8).toLowerCase() === 'https://')) {
-            $scope.url = '';
+            $scope.error = "";
             var data = {
                 url: post.url
             }
@@ -18,6 +18,7 @@ app.controller('UrlCtrl', ['$scope', '$http', function ($scope, $http) {
                 });
         }
         else {
+            $scope.short = "";
             $scope.error = 'URL is not valid';
         }
     }

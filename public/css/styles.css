@@ -7,7 +7,8 @@ html, body, div {
 	border: 0;
 	font-size: 100%;
 	font: inherit;
-	vertical-align: baseline;
+	color: #222;
+	font-family: Source Sans Pro;
 }
 
 body {
@@ -26,14 +27,38 @@ body {
 
 h1 {
   font-family: Lato;
+	color: #1565c0;
 }
 
 input {
 	background-color: #ecf0f1;
+	border-top-left-radius: 50px;
+	border-bottom-left-radius: 50px;
 }
 
 button {
 	background-color: #1565c0;
+	border-top-right-radius: 50px;
+	border-bottom-right-radius: 50px;
+	color: #ecf0f1;
+}
+
+#input {
+	width: 100%;
+	padding-bottom: 20px;
+}
+
+#words {
+	padding-top: 55px;
+}
+
+#disp {
+	text-decoration: none;
+	color: #222;
+}
+
+#disp:hover {
+	color: #1565c0;
 }
 
 input:focus, button:focus {
@@ -41,17 +66,11 @@ input:focus, button:focus {
 }
 
 input, button {
+		font-family: Lato;
     transition-duration: .3s;
     font-size: 15px;
-    font-family: Source Sans Pro;
-    padding: 25px;
+    padding: 25px 35px;
     border: none;
     box-shadow: none;
 		float: left;
-		font-family: Source Sans Pro;
-}
-
-p {
-	padding-top: 40px;
-	font-family: Source Sans Pro;
 }
