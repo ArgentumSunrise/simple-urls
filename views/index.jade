@@ -1,0 +1,11 @@
+extends layout
+
+block content
+  div(ng-controller='UrlCtrl').wrapper
+    h1= title
+    form(action='/', method='post')
+      input(type='text' placeholder='ex: http://google.com' name="url" ng-model="post.url")
+      button(type='submit' ng-click='newURL(post)') Shorten URL
+      p {{error}}
+      a(ng-if='short' ng-href='/{{short}}') {{short}}
+      p Made by Colter Giem with the help of Henry Kaufman
