@@ -1,4 +1,3 @@
-var cool = require('cool-ascii-faces');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -105,10 +104,6 @@ app.get('/:url', function (req, res) {
         }
     });
 })
-
-app.get('/cool', function(request, response) {
-  response.send(cool());
-});
 
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
